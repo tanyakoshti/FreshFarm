@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  phone     String?
+  name      String?
+  createdAt DateTime @default(now())
+  orders    Order[]
+  devices   DeviceFingerprint[]
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  name      String
+  price     Float
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  customerId  String?
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  customer    User?    @relation(fields: [customerId], references: [id])
+}
+
+model Delivery {
+  id          String   @id @default(uuid())
+  status      String   @default("ASSIGNED")
+  acceptedAt  DateTime?
+  deliveredAt DateTime?
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(uuid())
+  userId    String?
+  event     String
+  meta      Json?
+  createdAt DateTime @default(now())
+}
+
+model DeviceFingerprint {
+  id        String   @id @default(uuid())
+  userId    String?
+  ip        String?
+  deviceId  String?
+  model     String?
+  os        String?
+  osVersion String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  message   String
+  rating    Int
+  createdAt DateTime @default(now())
+}
+
+model FraudFlag {
+  id        String   @id @default(uuid())
+  userId    String
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model Alert {
+  id        String   @id @default(uuid())
+  type      String
+  message   String
+  severity  String   @default("HIGH")
+  createdAt DateTime @default(now())
+}
+
+model EtaHistory {
+  id         String   @id @default(uuid())
+  orderId    String
+  etaMinutes Int
+  createdAt  DateTime @default(now())
+}
